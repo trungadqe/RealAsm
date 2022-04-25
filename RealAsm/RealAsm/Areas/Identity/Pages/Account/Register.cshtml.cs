@@ -136,7 +136,7 @@ namespace RealAsm.Areas.Identity.Pages.Account
                 user.BirthDay = Input.BirthDay;
                 user.Address = Input.Address;
                 user.Gender = Input.Gender;
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
