@@ -2,19 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using RealAsm.Areas.Identity.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace RealAsm.Areas.Identity.Pages.Account
 {
@@ -22,11 +15,13 @@ namespace RealAsm.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<RealAsmUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly UserManager<RealAsmUser> _userManager;
 
-        public LoginModel(SignInManager<RealAsmUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<RealAsmUser> signInManager, ILogger<LoginModel> logger, UserManager<RealAsmUser> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -115,7 +110,17 @@ namespace RealAsm.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    /*LocalRedirect(returnUrl);*/
+                    RealAsmUser userName = await _userManager.FindByNameAsync(Input.UserName);
+                    var rolesname = await _userManager.GetRolesAsync(userName);
+                    if (rolesname.Contains("Customer"))
+                    {
+                        return RedirectToAction("HomeCustomerIndex", "Home", new { area = "" });
+                    }
+                    if (rolesname.Contains("Seller"))
+                    {
+                        return RedirectToPage("HomeSellerIndex.cshtml", "Home", new { area = "" });
+                    }
                 }
                 if (result.RequiresTwoFactor)
                 {
