@@ -61,7 +61,7 @@ namespace RealAsm.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
-            public string UserName { get; set; }
+            public string Email { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -106,12 +106,12 @@ namespace RealAsm.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
                     /*LocalRedirect(returnUrl);*/
-                    RealAsmUser userName = await _userManager.FindByNameAsync(Input.UserName);
+                    RealAsmUser userName = await _userManager.FindByNameAsync(Input.Email);
                     var rolesname = await _userManager.GetRolesAsync(userName);
                     if (rolesname.Contains("Customer"))
                     {

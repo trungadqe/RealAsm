@@ -85,10 +85,9 @@ namespace RealAsm.Areas.Identity.Pages.Account
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
-
             [Required]
-            [Display(Name = "User Name")]
-            public string UserName { get; set; }
+            [Display(Name = "Full Name")]
+            public string FullName { get; set; }
 
             [Required]
             [Display(Name = "Your Role")]
@@ -133,10 +132,11 @@ namespace RealAsm.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
+                user.FullName = Input.FullName;
                 user.BirthDay = Input.BirthDay;
                 user.Address = Input.Address;
                 user.Gender = Input.Gender;
-                await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
