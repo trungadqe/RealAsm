@@ -8,11 +8,11 @@ namespace RealAsm.Models
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string UId { get; set; }
+        public string UId { get; set; } = null!;
         public DateTime OrderDate { get; set; }
         public double Total { get; set; }
         public RealAsmUser User { get; set; }
-        public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
+        public virtual ICollection<OrderDetail>? OrderDetails { get; set; } = null!;
 
     }
 }

@@ -25,10 +25,11 @@ public class RealAsmContext : IdentityDbContext<RealAsmUser>
             .HasOne<Store>(b => b.Store)
             .WithMany(st => st.Books)
             .HasForeignKey(b => b.StoreId);
+
         builder.Entity<Book>()
             .HasOne<Category>(b => b.Category)
             .WithMany(st => st.Books)
-            .HasForeignKey(b => b.StoreId);
+            .HasForeignKey(b => b.CategoryId);
 
         builder.Entity<Order>()
             .HasOne<RealAsmUser>(o => o.User)
@@ -48,9 +49,9 @@ public class RealAsmContext : IdentityDbContext<RealAsmUser>
 
     }
     public DbSet<Category> Categories { get; set; } = null!;
-    public DbSet<Store> Store { get; set; }
-    public DbSet<Book> Book { get; set; }
-    public DbSet<Order> Order { get; set; }
+    public DbSet<Store> Store { get; set; } = null!;
+    public DbSet<Book> Book { get; set; } = null!;
+    public DbSet<Order> Order { get; set; } = null!;
     public DbSet<OrderDetail> OrderDetail { get; set; }
 
 }

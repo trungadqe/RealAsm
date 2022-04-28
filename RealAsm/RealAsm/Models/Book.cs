@@ -11,15 +11,15 @@ namespace RealAsm.Models
 
         [ValidateNever]
         public Category Category { get; set; } = null!;
-        public string Title { get; set; }
-        public int Pages { get; set; }
-        public string Author { get; set; }
+        public string Title { get; set; } = null!;
+        public int Pages { get; set; } 
+        public string Author { get; set; } = null!;
         public double Price { get; set; }
-        public string Desc { get; set; }
-        public string ImgUrl { get; set; }
+        public string Desc { get; set; } = null!;
+        public string ImgUrl { get; set; } = null!;
         public int StoreId { get; set; }
         public Store Store { get; set; }
-        public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
+        public virtual ICollection<OrderDetail>? OrderDetails { get; set; } = null!;
 
     }
 }

@@ -39,7 +39,7 @@ namespace RealAsm.Areas.Identity.Pages.Account
         public List<SelectListItem> Genders { get; } = new List<SelectListItem>
           {
               new SelectListItem { Value = "Male", Text = "Male" },
-                  new SelectListItem { Value = "Female", Text = "Female" }
+              new SelectListItem { Value = "Female", Text = "Female" }
           };
         public RegisterModel(
             UserManager<RealAsmUser> userManager,

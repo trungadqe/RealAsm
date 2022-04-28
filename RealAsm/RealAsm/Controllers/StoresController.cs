@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,22 +12,24 @@ using RealAsm.Models;
 
 namespace RealAsm.Controllers
 {
-    public class CategoryController : Controller
+    public class StoresController : Controller
     {
         private readonly RealAsmContext _context;
-
-        public CategoryController(RealAsmContext context)
+        private readonly UserManager<RealAsmUser> _userManager;
+        public StoresController(RealAsmContext context, UserManager<RealAsmUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        // GET: Category
+        // GET: Stores
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            var realAsmContext = _context.Store.Include(s => s.User);
+            return View(await realAsmContext.ToListAsync());
         }
 
-        // GET: Category/Details/5
+        // GET: Stores/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,41 +37,44 @@ namespace RealAsm.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var store = await _context.Store
+                .Include(s => s.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (store == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(store);
         }
 
-        // GET: Category/Create
-        /*[Authorize(Roles = "Seller")]*/
-        public IActionResult Create()
+        // GET: Stores/Create
+        public async Task<IActionResult> CreateAsync()
         {
+            var userName = await _userManager.GetUserAsync(HttpContext.User);
+            var UId = await _userManager.GetUserIdAsync(userName);
             return View();
         }
 
-        // POST: Category/Create
+        // POST: Stores/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( Category category)
+        public async Task<IActionResult> Create([Bind("Id,Name,Address,Slogan,UId")] Store store)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(store);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            var userName = await _userManager.GetUserAsync(HttpContext.User);
+            var UId = await _userManager.GetUserIdAsync(userName);
+            return View(store);
         }
 
-        // GET: Category/Edit/5
-        /*[Authorize(Roles = "Seller")]*/
+        // GET: Stores/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,22 +82,23 @@ namespace RealAsm.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var store = await _context.Store.FindAsync(id);
+            if (store == null)
             {
                 return NotFound();
             }
-            return View(category);
+            ViewData["UId"] = new SelectList(_context.Users, "Id", "Id", store.UId);
+            return View(store);
         }
 
-        // POST: Category/Edit/5
+        // POST: Stores/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CreatedDate")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,Slogan,UId")] Store store)
         {
-            if (id != category.Id)
+            if (id != store.Id)
             {
                 return NotFound();
             }
@@ -101,12 +107,12 @@ namespace RealAsm.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(store);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!StoreExists(store.Id))
                     {
                         return NotFound();
                     }
@@ -117,11 +123,11 @@ namespace RealAsm.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["UId"] = new SelectList(_context.Users, "Id", "Id", store.UId);
+            return View(store);
         }
 
-        // GET: Category/Delete/5
-        [Authorize(Roles = "Seller")]
+        // GET: Stores/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -129,30 +135,31 @@ namespace RealAsm.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var store = await _context.Store
+                .Include(s => s.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (store == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(store);
         }
 
-        // POST: Category/Delete/5
+        // POST: Stores/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(category);
+            var store = await _context.Store.FindAsync(id);
+            _context.Store.Remove(store);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool StoreExists(int id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return _context.Store.Any(e => e.Id == id);
         }
     }
 }
